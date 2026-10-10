@@ -1,0 +1,13 @@
+# Build output
+.build/
+*.app/
+DerivedData/
+*.xcuserstate
+
+# macOS
+.DS_Store
+
+# Local secrets / user data (never commit)
+notion-token.txt
+diagnostics.log
+library.json
