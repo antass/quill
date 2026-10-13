@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quill</title>
+<meta name="description" content="A native macOS RSS reader that saves articles to Notion, groups by topic instead of source, and pulls full article text.">
+<style>
+  :root {
+    --bg: #fdfcfa;
+    --surface: #ffffff;
+    --text: #1a1a18;
+    --muted: #6b6b64;
+    --faint: #9a9a92;
+    --line: #e6e4df;
+    --accent: #8a5a2b;
+    --accent-soft: #f4ece3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141413;
+      --surface: #1c1c1a;
+      --text: #f0efea;
+      --muted: #a3a29b;
+      --faint: #6e6d66;
+      --line: #2e2e2b;
+      --accent: #d4a373;
+      --accent-soft: #2a2420;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141413; --surface: #1c1c1a; --text: #f0efea; --muted: #a3a29b;
+    --faint: #6e6d66; --line: #2e2e2b; --accent: #d4a373; --accent-soft: #2a2420;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 ui-sans-serif, -apple-system, "SF Pro Text", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+
+  header { padding: 88px 0 56px; }
+  .mark {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-weight: 600; letter-spacing: -0.01em; color: var(--muted);
+    font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .mark svg { display: block; }
+  h1 {
+    font-size: clamp(38px, 7vw, 60px);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    margin: 20px 0 0;
+    font-weight: 650;
+  }
+  .tagline {
+    font-size: clamp(18px, 2.6vw, 21px);
+    color: var(--muted);
+    margin: 18px 0 0;
+    max-width: 34em;
+  }
+  .meta {
+    margin-top: 28px; display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .chip {
+    font-size: 13px; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 100px;
+    padding: 4px 12px; background: var(--surface);
+  }
+
+  section { padding: 40px 0; border-top: 1px solid var(--line); }
+  h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--faint); font-weight: 600; margin: 0 0 24px;
+  }
+
+  .feature { margin-bottom: 30px; }
+  .feature:last-child { margin-bottom: 0; }
+  .feature h3 {
+    font-size: 18px; margin: 0 0 6px; font-weight: 600; letter-spacing: -0.01em;
+  }
+  .feature p { margin: 0; color: var(--muted); }
+
+  pre {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 14px 16px; overflow-x: auto;
+    font: 13px/1.6 ui-monospace, "SF Mono", Menlo, monospace;
+    color: var(--text); margin: 0 0 14px;
+  }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.92em; }
+  p code {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 1px 5px; border-radius: 4px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  td { padding: 8px 0; border-bottom: 1px solid var(--line); color: var(--muted); }
+  td:first-child { color: var(--text); width: 45%; }
+  tr:last-child td { border-bottom: 0; }
+  kbd {
+    font: 12px ui-monospace, Menlo, monospace;
+    border: 1px solid var(--line); border-bottom-width: 2px;
+    border-radius: 5px; padding: 2px 6px; background: var(--surface);
+    color: var(--text);
+  }
+
+  .note {
+    background: var(--accent-soft); border-left: 2px solid var(--accent);
+    padding: 14px 16px; border-radius: 0 8px 8px 0; font-size: 15px;
+    color: var(--text);
+  }
+  .note strong { color: var(--accent); }
+
+  footer {
+    padding: 40px 0 72px; border-top: 1px solid var(--line);
+    color: var(--faint); font-size: 14px;
+  }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { border-bottom-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="mark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 20 L14 10"/><path d="M12 4 L20 12 L14 10 Z" fill="currentColor"/>
+      </svg>
+      Quill
+    </div>
+    <h1>An RSS reader that<br>actually files things.</h1>
+    <p class="tagline">
+      A native macOS reader for NYT, Substack and whatever blogs you follow — grouped
+      by topic rather than by source, with one keystroke to file an article into Notion.
+    </p>
+    <div class="meta">
+      <span class="chip">SwiftUI &amp; AppKit</span>
+      <span class="chip">No Electron</span>
+      <span class="chip">Builds without Xcode</span>
+      <span class="chip">macOS 14+</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>What it does differently</h2>
+
+    <div class="feature">
+      <h3>The sidebar groups by topic, not by feed</h3>
+      <p>
+        Seventeen feeds produce one list of sources, which tells you nothing about what
+        you actually want to read. Quill folds each publisher's own category tags into a
+        canonical topic set — AI, Books, Politics, Health — and groups by that instead.
+        Sources are still there, just demoted to a collapsible section.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Publisher categories are messy, so they get normalised</h3>
+      <p>
+        One NYT feed alone ships over 150 distinct category strings, down to
+        "Death&nbsp;Row&nbsp;Records". Those are matched with word boundaries against a
+        rule set and ranked, with the headline used only as a fallback when a feed
+        publishes no categories at all. Your own hand-applied tags always win.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Full article text, not a teaser and a link</h3>
+      <p>
+        When a feed carries only a stub, Quill loads the publisher's page in an off-screen
+        WebKit view and runs a compact Readability pass over the live DOM — real parsing,
+        not regular expressions over raw HTML. Lazy-loaded images are promoted, relative
+        URLs resolved, and the feed body kept as a fallback.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>It adapts to your Notion database, not the reverse</h3>
+      <p>
+        No required schema. Quill reads your database's own properties and matches them by
+        name and type — title, url, author, date, summary, tags, status — filling what
+        exists and ignoring the rest. It writes to exactly one summary field and never
+        touches one you've reserved for AI-generated text.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Build it</h2>
+    <pre>git clone git@github.com:antass/quill.git
+cd quill
+./build.sh</pre>
+    <p style="color:var(--muted);margin:0">
+      Command Line Tools are enough — no Xcode. <code>build.sh</code> compiles with
+      <code>swiftc</code>, assembles the <code>.app</code> bundle by hand, ad-hoc signs it
+      and installs to <code>/Applications</code>.
+    </p>
+  </section>
+
+  <section>
+    <h2>Connecting Notion</h2>
+    <pre>./add-notion-token.sh</pre>
+    <p style="color:var(--muted);margin:0 0 18px">
+      Prompts for your integration token with the input hidden, hands it to Quill, which
+      stores it in the macOS Keychain and deletes the temporary file. The token never
+      sits on disk in plain text.
+    </p>
+    <div class="note">
+      <strong>The step people skip:</strong> a token alone grants access to nothing. In
+      Notion, open the database you want to save into, then <code>⋯</code> →
+      Connections → add your integration. Without that, Notion hides every database
+      from the token and Quill will show an empty list.
+    </div>
+  </section>
+
+  <section>
+    <h2>Keys</h2>
+    <table>
+      <tr><td>Refresh all feeds</td><td><kbd>⌘R</kbd></td></tr>
+      <tr><td>Add a feed</td><td><kbd>⌘N</kbd></td></tr>
+      <tr><td>Save to Notion</td><td><kbd>⇧⌘S</kbd></td></tr>
+      <tr><td>Add a tag</td><td><kbd>⌘T</kbd></td></tr>
+      <tr><td>Open in browser</td><td><kbd>⇧⌘O</kbd></td></tr>
+      <tr><td>Star / unstar</td><td><kbd>⌘L</kbd></td></tr>
+      <tr><td>Toggle read</td><td><kbd>⌘U</kbd></td></tr>
+      <tr><td>Mark all read</td><td><kbd>⇧⌘U</kbd></td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Known limits</h2>
+    <div class="feature">
+      <h3>The NYT blocks full-text extraction</h3>
+      <p>
+        NYT returns an empty bot-challenge page to an embedded browser, so full text
+        can't be pulled even with a subscription. Quill ships a sign-in window that
+        shares its cookie jar, which may clear the challenge — but this is unverified.
+        NYT articles otherwise keep their RSS summary and open in your own browser.
+      </p>
+    </div>
+    <div class="feature">
+      <h3>Roughly a fifth of articles land untagged</h3>
+      <p>
+        Personal essays genuinely resist classification, and older articles stored before
+        category parsing existed have none to work from. That share shrinks on its own as
+        feeds refresh and backfill. Everything else goes in an Untagged bucket to tag by hand.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    Built on macOS with Claude Code.
+    <a href="https://github.com/antass/quill">Source on GitHub</a>.
+  </footer>
+
+</div>
+</body>
+</html>
